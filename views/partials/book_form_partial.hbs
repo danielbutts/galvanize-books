@@ -1,0 +1,37 @@
+{{#each messages}}
+  <div>{{this}}</div>
+{{/each}}
+<br>
+
+<div class="row">
+  <div class="col-xs-4 text-left">
+    <form action="/books{{#if isEdit}}/{{book.id}}?_method=PUT{{/if}}" method="POST">
+      <input id="id" type="hidden" name="id" value="{{book.id}}">
+
+      <div class="form-group">
+        <label for="title">Title</label><input id="title" type="text" name="title" class="form-control" value="{{book.title}}">
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label><textarea id="description" rows="5" name="description" class="form-control">{{book.description}}</textarea>
+      </div>
+      <div class="form-group">
+        <label for="title">Genre</label><input id="genre" type="text" name="genre" class="form-control" value="{{book.genre}}">
+      </div>
+      <div class="form-group">
+        <label for="imageUrl">Image URL</label><input id="imageUrl" type="text" name="imageUrl" class="form-control" value="{{book.imageUrl}}">
+      </div>
+      <div class="form-group">
+        <label for="authors">Authors</label>
+        <select id="authors" name="authors" class="form-control" multiple="true">
+          {{#each authors}}
+            <option id="authors" name="authors" value="{{id}}" {{#if selected}}selected="true"{{/if}}>{{id}} {{first_name}} {{last_name}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+
+      <br>
+      <input id="submit" type="submit" value="Save">
+    </form>
+</div>
+</div>

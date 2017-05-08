@@ -50,12 +50,124 @@ router.get('/', (req, res, next) => {
   });
 });
 
+router.get('/edit/:id', (req, res, next) => {
+  // TODO get current authors and set selected in form
+  const id = req.params.id;
+  getBooks(id).then((results) => {
+    knex('authors').distinct('id', 'first_name', 'last_name')
+    .then((authors) => {
+      const books = assembleBookObjects(results);
+      res.render('edit-book', { book: books[id], authors, isEdit: true });
+    });
+  })
+  .catch((err) => {
+    next(err);
+  });
+});
+
+router.get('/new', (req, res) => {
+  knex('authors').distinct('id', 'first_name', 'last_name')
+  .then((authors) => {
+    res.render('edit-book', { authors });
+  });
+});
+
+function validateForm(fields) {
+  const { title, description, genre, imageUrl, authors } = fields;
+  const messages = [];
+
+  if (title === undefined || title.length === 0) {
+    messages.push('Title cannot be empty.');
+  }
+  if (description === undefined || description.length === 0) {
+    messages.push('Description cannot be empty.');
+  }
+  if (genre === undefined || genre.length === 0) {
+    messages.push('Genre cannot be empty.');
+  }
+  if (imageUrl === undefined || imageUrl.length === 0) {
+    messages.push('You must provide a link to an image.');
+  }
+  if (authors === undefined || authors.length === 0) {
+    messages.push('You must select at least one author.');
+  }
+  return messages;
+}
+
+router.post('/', (req, res, next) => {
+  const { title, description, genre, imageUrl, authors } = req.body;
+  const messages = validateForm(req.body);
+
+  if (messages.length > 0) {
+    knex('authors').distinct('id', 'first_name', 'last_name')
+    .then((result) => {
+      res.render('edit-book', { authors: result, messages, book: req.body });
+    });
+  } else {
+    knex('books').insert({ title, description, genre, image_url: imageUrl }).returning('*')
+    .then((books) => {
+      const id = books[0].id;
+      const bookAuthors = [];
+      if (Array.isArray(authors)) {
+        authors.forEach((author) => {
+          bookAuthors.push({ book_id: id, author_id: author });
+        });
+      } else {
+        bookAuthors.push({ book_id: id, author_id: authors });
+      }
+      knex('book_author').insert(bookAuthors)
+      .then(() => {
+        res.redirect('books');
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+  }
+});
+
+router.put('/:id', (req, res, next) => {
+  const id = req.params.id;
+  const { title, description, genre, imageUrl, authors } = req.body;
+  const messages = validateForm(req.body);
+
+  if (messages.length > 0) {
+    knex('authors').distinct('id', 'first_name', 'last_name')
+    .then((result) => {
+      req.body.id = id;
+      res.render('edit-book', { authors: result, messages, book: req.body });
+    });
+  } else {
+    knex('books').update({ title, description, genre, image_url: imageUrl })
+    .where({ id })
+    .returning('*')
+    .then(() => {
+      knex('book_author').delete().where({ book_id: id })
+      .then(() => {
+        const bookAuthors = [];
+        if (Array.isArray(authors)) {
+          authors.forEach((author) => {
+            bookAuthors.push({ book_id: id, author_id: author });
+          });
+        } else {
+          bookAuthors.push({ book_id: id, author_id: authors });
+        }
+        knex('book_author').insert(bookAuthors)
+        .then(() => {
+          res.redirect('/books');
+        });
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+  }
+});
 
 router.get('/:id', (req, res, next) => {
   const id = req.params.id;
   getBooks(id).then((results) => {
     const books = assembleBookObjects(results);
-    console.log(books);
     res.render('book-detail', { book: books[id] });
   })
   .catch((err) => {

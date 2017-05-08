@@ -6,12 +6,17 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const books = require('./routes/books');
 const index = require('./routes/index');
+const hbs = require('hbs');
+const methodOverride = require('method-override');
 
 const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
+hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
+
+app.use(methodOverride('_method'));
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
