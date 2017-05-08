@@ -173,7 +173,7 @@ router.put('/:id', (req, res, next) => {
       //   }
       //   knex('book_author').insert(bookAuthors)
       //   .then(() => {
-      //     res.redirect('/books');
+      res.redirect('/authors');
       //   });
       // });
     })
