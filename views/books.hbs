@@ -10,17 +10,41 @@
       <div class="h3"><a href="/books/{{id}}">{{title}}</a></div>
       <div class="h4">{{genre}}</div>
       <p>{{description}}</p>
-      <div class="h5">Authors:</div>
+      <div class="h5"><b>Authors:</b></div>
       <ol>
       {{#each authors}}
         <li><a href="/authors/{{id}}">{{firstName}} {{lastName}}</a></li>
       {{/each}}
       </ol>
       <div><a href="/books/edit/{{id}}" class="btn btn-primary" role="button">Edit</a>
-        <a href="#" class="btn btn-danger" role="button">Delete</a>
+        <a href="" id="delete_{{id}}" class="btn btn-danger delete" role="button">Delete</a>
       </div>
     </div>
   </div>
   <br>
 {{/each}}
 </div>
+
+
+<script type="text/javascript">
+$(".delete").on("click",function(e) {
+  e.preventDefault();
+  let target = e.target.closest( "a" );
+  let id = $(target).attr("id").split('_')[1];
+
+  var opts = {
+    method: 'post',
+    url: `/books/${id}?_method=DELETE`
+  };
+
+  var $xhr = $.ajax(opts);
+
+  $xhr.done(function(result) {
+    console.log(result);
+    window.location = `/books?message=${result.message}`;
+  });
+  $xhr.fail(function(err) {
+    console.error(err);
+  });
+});
+</script>

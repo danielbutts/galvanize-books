@@ -175,4 +175,15 @@ router.get('/:id', (req, res, next) => {
   });
 });
 
+router.delete('/:id', (req, res, next) => {
+  const id = req.params.id;
+  knex('books').where({ id }).delete()
+  .then(() => {
+    res.send({ message: `successfully deleted book id ${id}` });
+  })
+  .catch((err) => {
+    next(err);
+  });
+});
+
 module.exports = router;
