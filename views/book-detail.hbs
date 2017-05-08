@@ -1,0 +1,16 @@
+<br>
+
+<div class="row">
+  <div class="col-xs-3 text-left"><img src="{{book.imageUrl}}" class="img-responsive"></div>
+  <div class="col-xs-6 text-left">
+    <div class="h3"><a href="/books/{{book.id}}">{{book.title}}</a></div>
+    <div class="h4">{{book.genre}}</div>
+    <p>{{book.description}}</p>
+    <div class="h5">Authors:</div>
+    <ol>
+    {{#each book.authors}}
+      <li><a href="/authors/{{id}}">{{firstName}} {{lastName}}</a></li>
+    {{/each}}
+    </ol>
+  </div>
+</div>

@@ -3,36 +3,60 @@ const knex = require('../db/connection');
 
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
-  knex.select('books.id as book_id', 'title', 'genre', 'description',
+function assembleBookObjects(results) {
+  const books = {};
+  results.forEach((book) => {
+    const { book_id, title, description, genre, book_img } = book;
+    if (books[book.book_id] === undefined) {
+      books[book.book_id] = {
+        id: book_id,
+        title,
+        description,
+        genre,
+        imageUrl: book_img,
+      };
+    }
+    if (books[book.book_id].authors === undefined) {
+      books[book.book_id].authors = [];
+    }
+    books[book.book_id].authors.push({
+      id: book.author_id,
+      firstName: book.first_name,
+      lastName: book.last_name,
+    });
+  });
+  return books;
+}
+
+function getBooks(id) {
+  let query = knex.select('books.id as book_id', 'title', 'genre', 'description',
   'books.image_url as book_img', 'authors.id as author_id', 'first_name', 'last_name')
   .from('books')
   .innerJoin('book_author', 'book_id', 'books.id')
-  .innerJoin('authors', 'author_id', 'authors.id')
-  .then((results) => {
-    const books = {};
-    results.forEach((book) => {
-      const { book_id, title, description, genre, book_img } = book;
-      // console.log(book_id, title, description, genre, book_img);
-      if (books[book.book_id] === undefined) {
-        books[book.book_id] = {
-          id: book_id,
-          title,
-          description,
-          genre,
-          imageUrl: book_img,
-        };
-      }
-      if (books[book.book_id].authors === undefined) {
-        books[book.book_id].authors = [];
-      }
-      books[book.book_id].authors.push({
-        id: book.author_id,
-        firstName: book.first_name,
-        lastName: book.last_name,
-      });
-    });
+  .innerJoin('authors', 'author_id', 'authors.id');
+  if (id !== undefined) {
+    query = query.where({ 'books.id': id });
+  }
+  return query;
+}
+
+router.get('/', (req, res, next) => {
+  getBooks().then((results) => {
+    const books = assembleBookObjects(results);
     res.render('books', { books });
+  })
+  .catch((err) => {
+    next(err);
+  });
+});
+
+
+router.get('/:id', (req, res, next) => {
+  const id = req.params.id;
+  getBooks(id).then((results) => {
+    const books = assembleBookObjects(results);
+    console.log(books);
+    res.render('book-detail', { book: books[id] });
   })
   .catch((err) => {
     next(err);
