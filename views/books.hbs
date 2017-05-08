@@ -1,7 +1,22 @@
+<div class="row">
+  <div class="col-xs-12 text-center">
+    <h3>BOOKS <a href="/books/new" class="btn btn-primary" role="button">New</a></h3>
+  </div>
+</div>
 <br>
 
 <div class="row">
-  <div class="col-xs-2 text-left">[ADD SEARCH/FILTER HERE]</div>
+  <div class="col-xs-2 text-left">
+    <div>
+      <a href="/books" class="btn btn-primary" role="button">BOOKS</a>
+    </div>
+    <br>
+    <div>
+      <a href="/authors" class="btn btn-success" role="button">AUTHORS</a>
+    </div>
+    <br>
+    [ADD SEARCH/FILTER HERE]
+  </div>
   <div class="col-xs-8 text-left">
 {{#each books}}
   <div class="row">
@@ -17,34 +32,10 @@
       {{/each}}
       </ol>
       <div><a href="/books/edit/{{id}}" class="btn btn-primary" role="button">Edit</a>
-        <a href="" id="delete_{{id}}" class="btn btn-danger delete" role="button">Delete</a>
+        <a href="/books/delete/{{id}}" class="btn btn-danger" role="button">Delete</a>
       </div>
     </div>
   </div>
   <br>
 {{/each}}
 </div>
-
-
-<script type="text/javascript">
-$(".delete").on("click",function(e) {
-  e.preventDefault();
-  let target = e.target.closest( "a" );
-  let id = $(target).attr("id").split('_')[1];
-
-  var opts = {
-    method: 'post',
-    url: `/books/${id}?_method=DELETE`
-  };
-
-  var $xhr = $.ajax(opts);
-
-  $xhr.done(function(result) {
-    console.log(result);
-    window.location = `/books?message=${result.message}`;
-  });
-  $xhr.fail(function(err) {
-    console.error(err);
-  });
-});
-</script>

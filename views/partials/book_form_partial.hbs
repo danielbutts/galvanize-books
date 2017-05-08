@@ -1,10 +1,18 @@
+<div class="row">
+  <div class="col-xs-12 text-center">
+    <h3>{{#if isEdit}}EDIT{{else}}ADD{{/if}} BOOK</h3>
+  </div>
+</div>
+<br>
+
 {{#each messages}}
   <div>{{this}}</div>
 {{/each}}
 <br>
 
 <div class="row">
-  <div class="col-xs-4 text-left">
+  <div class="col-xs-3 text-center"></div>
+    <div class="col-xs-6 text-center">
     <form action="/books{{#if isEdit}}/{{book.id}}?_method=PUT{{/if}}" method="POST">
       <input id="id" type="hidden" name="id" value="{{book.id}}">
 
@@ -24,14 +32,15 @@
         <label for="authors">Authors</label>
         <select id="authors" name="authors" class="form-control" multiple="true">
           {{#each authors}}
-            <option id="authors" name="authors" value="{{id}}" {{#if selected}}selected="true"{{/if}}>{{id}} {{first_name}} {{last_name}}
+            <option id="authors" name="authors" value="{{id}}" {{#if selected}}selected="true"{{/if}}>{{first_name}} {{last_name}}
             </option>
           {{/each}}
         </select>
       </div>
 
       <br>
-      <input id="submit" type="submit" value="Save">
+      <input id="submit" type="submit" value="Save"> <a href="/books/{{book.id}}" class="btn btn-warning" role="button">Cancel</a></div>
+
     </form>
 </div>
 </div>

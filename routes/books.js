@@ -65,6 +65,21 @@ router.get('/edit/:id', (req, res, next) => {
   });
 });
 
+router.get('/delete/:id', (req, res, next) => {
+  // TODO get current authors and set selected in form
+  const id = req.params.id;
+  getBooks(id).then((results) => {
+    knex('authors').distinct('id', 'first_name', 'last_name')
+    .then((authors) => {
+      const books = assembleBookObjects(results);
+      res.render('book-detail', { book: books[id], authors, isDelete: true });
+    });
+  })
+  .catch((err) => {
+    next(err);
+  });
+});
+
 router.get('/new', (req, res) => {
   knex('authors').distinct('id', 'first_name', 'last_name')
   .then((authors) => {

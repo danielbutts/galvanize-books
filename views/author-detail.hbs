@@ -1,0 +1,62 @@
+<div class="row">
+  <div class="col-xs-12 text-center">
+    <h3>{{#if isDelete}}CONFIRM DELETE{{else}}AUTHOR DETAIL{{/if}}</h3>
+  </div>
+</div>
+<br>
+
+<div class="row">
+  <div class="col-xs-2 text-left">
+    <div>
+      <a href="/books" class="btn btn-primary" role="button">BOOKS</a>
+    </div>
+    <br>
+    <div>
+      <a href="/authors" class="btn btn-success" role="button">AUTHORS</a>
+    </div>
+    <br>
+  </div>
+  <div class="col-xs-3 text-left"><img src="{{author.imageUrl}}" class="img-responsive"></div>
+  <div class="col-xs-6 text-left">
+    <div class="h3"><a href="/authors/{{author.id}}">{{author.firstName}} {{author.lastName}}</a></div>
+    <p>{{author.biography}}</p>
+    <div class="h5"><b>Books:</b></div>
+    <ol>
+    {{#each author.books}}
+      <li><a href="/books/{{id}}">{{title}}</a></li>
+    {{/each}}
+    </ol>
+    {{#if isDelete}}
+    <div><a href="/authors/{{author.id}}" class="btn btn-warning" role="button">Cancel</a>
+      <a href="" id="delete_{{author.id}}" class="btn btn-danger delete" role="button">Confirm</a>
+    </div>
+    {{else}}
+    <div><a href="/authors/edit/{{author.id}}" class="btn btn-primary" role="button">Edit</a>
+      <a href="/authors/delete/{{author.id}}" class="btn btn-danger" role="button">Delete</a>
+    </div>
+    {{/if}}
+  </div>
+</div>
+
+<script type="text/javascript">
+$(".delete").on("click",function(e) {
+  e.preventDefault();
+  let target = e.target.closest( "a" );
+  let id = $(target).attr("id").split('_')[1];
+
+  var opts = {
+    method: 'post',
+    url: `/authors/${id}?_method=DELETE`
+  };
+
+  var $xhr = $.ajax(opts);
+
+  $xhr.done(function(result) {
+    console.log(result);
+    window.location = `/authors?message=${result.message}`;
+  });
+  $xhr.fail(function(err) {
+    console.error(err);
+  });
+});
+</script>

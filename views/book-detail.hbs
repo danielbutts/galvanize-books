@@ -1,6 +1,23 @@
+<div class="row">
+  <div class="col-xs-12 text-center">
+    <h3>{{#if isDelete}}CONFIRM DELETE{{else}}BOOK DETAIL{{/if}}</h3>
+  </div>
+</div>
 <br>
 
+
 <div class="row">
+  <div class="col-xs-2 text-left">
+    <div>
+      <a href="/books" class="btn btn-primary" role="button">BOOKS</a>
+    </div>
+    <br>
+    <div>
+      <a href="/authors" class="btn btn-success" role="button">AUTHORS</a>
+    </div>
+    <br>
+    [ADD SEARCH/FILTER HERE]
+  </div>
   <div class="col-xs-3 text-left"><img src="{{book.imageUrl}}" class="img-responsive"></div>
   <div class="col-xs-6 text-left">
     <div class="h3"><a href="/books/{{book.id}}">{{book.title}}</a></div>
@@ -12,9 +29,15 @@
       <li><a href="/authors/{{id}}">{{firstName}} {{lastName}}</a></li>
     {{/each}}
     </ol>
-    <div><a href="/books/edit/{{book.id}}" class="btn btn-primary" role="button">Edit</a>
-      <a href="" id="delete_{{book.id}}" class="btn btn-danger delete" role="button">Delete</a>
+    {{#if isDelete}}
+    <div><a href="/books/{{book.id}}" class="btn btn-warning" role="button">Cancel</a>
+      <a href="" id="delete_{{book.id}}" class="btn btn-danger delete" role="button">Confirm</a>
     </div>
+    {{else}}
+    <div><a href="/books/edit/{{book.id}}" class="btn btn-primary" role="button">Edit</a>
+      <a href="/books/delete/{{book.id}}" class="btn btn-danger" role="button">Delete</a>
+    </div>
+    {{/if}}
   </div>
 </div>
 

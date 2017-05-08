@@ -5,6 +5,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const books = require('./routes/books');
+const authors = require('./routes/authors');
 const index = require('./routes/index');
 const hbs = require('hbs');
 const methodOverride = require('method-override');
@@ -27,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/books', books);
+app.use('/authors', authors);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
