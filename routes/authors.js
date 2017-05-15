@@ -60,6 +60,12 @@ router.get('/edit/:id', (req, res, next) => {
     knex('books').distinct('id', 'title')
     .then((books) => {
       const authors = assembleAuthorObjects(results);
+      const authorBookIds = authors[id].books.map(el => el.id);
+      books.forEach((book) => {
+        if (authorBookIds.includes(book.id)) {
+          book.selected = true;
+        }
+      });
       res.render('edit-author', { author: authors[id], books, isEdit: true });
     });
   })
@@ -146,6 +152,7 @@ router.put('/:id', (req, res, next) => {
   const { firstName, lastName, imageUrl, biography } = req.body;
   const messages = validateForm(req.body);
   const books = req.body.books;
+  console.log(books);
   if (books === undefined || books.length === 0) {
     messages.push('You must select at least one book.');
   }
@@ -157,25 +164,26 @@ router.put('/:id', (req, res, next) => {
       res.render('edit-author', { authors: result, messages, book: req.body });
     });
   } else {
+    console.log('updating');
     knex('authors').update({ first_name: firstName, last_name: lastName, biography, image_url: imageUrl })
     .where({ id })
     .returning('*')
     .then(() => {
-      // knex('book_author').delete().where({ book_id: id })
-      // .then(() => {
-      //   const bookAuthors = [];
-      //   if (Array.isArray(books)) {
-      //     books.forEach((book) => {
-      //       bookAuthors.push({ book_id: id, author_id: author });
-      //     });
-      //   } else {
-      //     bookAuthors.push({ book_id: id, author_id: authors });
-      //   }
-      //   knex('book_author').insert(bookAuthors)
-      //   .then(() => {
-      res.redirect('/authors');
-      //   });
-      // });
+      knex('book_author').delete().where({ author_id: id })
+      .then(() => {
+        const bookAuthors = [];
+        if (Array.isArray(books)) {
+          books.forEach((book) => {
+            bookAuthors.push({ book_id: book, author_id: id });
+          });
+        } else {
+          bookAuthors.push({ book_id: books, author_id: id });
+        }
+        knex('book_author').insert(bookAuthors)
+        .then(() => {
+          res.redirect('/authors');
+        });
+      });
     })
     .catch((err) => {
       next(err);
